@@ -38,13 +38,15 @@ const DiceGame: NextPage = () => {
   const { gameWallet, isLoading: isLoadingGameWallet, error: gameWalletError } = useGameWallet();
 
   // Game wallet transactions
-  const { rollDiceWithGameWallet, isTransactionPending, transactionError } = useGameWalletTransaction({ gameWallet });
+  const { rollDiceWithGameWallet, redeemCardsWithGameWallet, isTransactionPending, transactionError } =
+    useGameWalletTransaction({ gameWallet });
 
-  // Player stats
+  // Player stats - use game wallet address if available, otherwise use connected address
+  const statsAddress = gameWallet?.address || address;
   const { data: playerStats } = useScaffoldReadContract({
     contractName: "DiceGame",
     functionName: "getPlayerStats",
-    args: address ? [address as AddressType] : [undefined],
+    args: statsAddress ? [statsAddress as AddressType] : [undefined],
   });
 
   // Use WebSocket for real-time events
@@ -108,11 +110,17 @@ const DiceGame: NextPage = () => {
   }, [isRolling]);
 
   const handleRedeem = async () => {
-    if (!address) return;
+    if (!statsAddress) return;
 
     setIsRedeeming(true);
     try {
-      await writeRedeemAsync({ functionName: "redeemCards" });
+      if (gameWallet) {
+        // Use game wallet for redeem transaction
+        await redeemCardsWithGameWallet();
+      } else {
+        // Fallback to connected wallet
+        await writeRedeemAsync({ functionName: "redeemCards" });
+      }
     } catch (err) {
       console.error("Error calling redeemCards function", err);
     } finally {

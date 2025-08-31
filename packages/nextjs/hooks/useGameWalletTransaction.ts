@@ -79,8 +79,66 @@ export const useGameWalletTransaction = ({ gameWallet }: GameWalletTransactionPr
     }
   };
 
+  const redeemCardsWithGameWallet = async () => {
+    if (!gameWallet || !diceGameContract) {
+      setTransactionError("Game wallet or contract not available");
+      return null;
+    }
+
+    try {
+      setIsTransactionPending(true);
+      setTransactionError(null);
+
+      // Create wallet client with game wallet private key
+      const account = privateKeyToAccount(gameWallet.privateKey as `0x${string}`);
+      const walletClient = createWalletClient({
+        account,
+        chain: monadTestnet,
+        transport: http(),
+      });
+
+      // Create public client for reading contract data
+      const publicClient = createPublicClient({
+        chain: monadTestnet,
+        transport: http(),
+      });
+
+      // Prepare the transaction
+      await publicClient.simulateContract({
+        account: account.address,
+        address: diceGameContract.address as `0x${string}`,
+        abi: diceGameContract.abi as Abi,
+        functionName: "redeemCards",
+      });
+
+      // Encode the function data
+      const data = encodeFunctionData({
+        abi: diceGameContract.abi,
+        functionName: "redeemCards",
+      });
+
+      // Send the transaction using sendTransaction
+      const hash = await walletClient.sendTransaction({
+        to: diceGameContract.address,
+        data: data,
+        value: 0n, // No value needed for redeemCards
+        account: account,
+      });
+
+      console.log("Game wallet redeem cards transaction sent:", hash);
+      return hash;
+    } catch (err) {
+      console.error("Error redeeming cards with game wallet:", err);
+      setTransactionError(err instanceof Error ? err.message : "Failed to redeem cards");
+      return null;
+    } finally {
+      setIsTransactionPending(false);
+    }
+  };
+
   return {
     rollDiceWithGameWallet,
+    redeemCardsWithGameWallet,
     isTransactionPending,
     transactionError,
   };
