@@ -15,16 +15,16 @@ export const WinnerEvents = ({ winners }: WinnerEventsProps) => {
   return (
     <div className="mx-10">
       <div className="flex w-auto justify-center h-10">
-        <p className="flex justify-center text-lg font-bold">Winner Events</p>
+        <p className="flex justify-center text-lg font-bold text-base-content">Winner Events</p>
       </div>
 
       <table className="mt-4 p-2 bg-base-100 table table-zebra shadow-lg w-full overflow-hidden">
-        <thead className="text-accent text-lg">
+        <thead className="text-lg">
           <tr>
-            <th className="bg-primary" colSpan={3}>
+            <th className="bg-primary text-primary-content" colSpan={3}>
               Address
             </th>
-            <th className="bg-primary" colSpan={2}>
+            <th className="bg-primary text-primary-content" colSpan={2}>
               Won
             </th>
           </tr>

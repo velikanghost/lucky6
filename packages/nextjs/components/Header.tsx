@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useRef } from "react";
-import Image from "next/image";
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { hardhat } from "viem/chains";
-import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon } from "@heroicons/react/24/outline";
 import { CubeIcon } from "@heroicons/react/24/outline";
+import { GameWalletFunding } from "~~/components/GameWalletFunding";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
+import { useGameWallet } from "~~/hooks/useGameWallet";
 import { useMonadGamesId } from "~~/hooks/useMonadGamesId";
 
 type HeaderMenuLink = {
@@ -26,11 +27,6 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "Dice Game",
     href: "/dice",
     icon: <CubeIcon className="h-4 w-4" />,
-  },
-  {
-    label: "Debug Contracts",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
   },
 ];
 
@@ -67,10 +63,19 @@ export const Header = () => {
   const { targetNetwork } = useTargetNetwork();
   const isLocalNetwork = targetNetwork.id === hardhat.id;
   const { username, hasUsername, isLoading: isLoadingUsername, registerUsernameUrl } = useMonadGamesId();
+  const { gameWallet } = useGameWallet();
 
   const burgerMenuRef = useRef<HTMLDetailsElement>(null);
+  const monadDropdownRef = useRef<HTMLDetailsElement>(null);
+  const [isMonadDropdownOpen, setIsMonadDropdownOpen] = useState(false);
+
   useOutsideClick(burgerMenuRef, () => {
     burgerMenuRef?.current?.removeAttribute("open");
+  });
+
+  useOutsideClick(monadDropdownRef, () => {
+    setIsMonadDropdownOpen(false);
+    monadDropdownRef?.current?.removeAttribute("open");
   });
 
   return (
@@ -90,11 +95,11 @@ export const Header = () => {
           </ul>
         </details>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10">
+          {/* <div className="flex relative w-10 h-10">
             <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
-          </div>
+          </div> */}
           <div className="flex flex-col">
-            <span className="font-bold leading-tight">SRE Challenges</span>
+            <span className="font-bold leading-tight">Lucky6</span>
             <span className="text-xs">Dice Game</span>
           </div>
         </Link>
@@ -103,31 +108,42 @@ export const Header = () => {
         </ul>
       </div>
 
-      {/* Monad Games ID Display */}
-      <div className="navbar-center hidden lg:flex">
-        {isLoadingUsername ? (
-          <div className="text-sm opacity-70">Loading Monad ID...</div>
-        ) : hasUsername && username ? (
-          <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
-            <span className="text-sm font-medium text-primary">@{username}</span>
-            <span className="text-xs opacity-70">Monad Games ID</span>
-          </div>
-        ) : hasUsername === false ? (
-          <div className="flex items-center gap-2">
-            <span className="text-sm opacity-70">No Monad ID</span>
-            <a
-              href={registerUsernameUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-xs btn-primary normal-case"
-            >
-              Register
-            </a>
-          </div>
-        ) : null}
-      </div>
-
       <div className="navbar-end grow mr-4">
+        {/* Monad Games ID Display with Dropdown */}
+        <div className="navbar-center hidden lg:flex">
+          {isLoadingUsername ? (
+            <div className="text-sm opacity-70">Loading Monad ID...</div>
+          ) : hasUsername && username ? (
+            <details className="dropdown" ref={monadDropdownRef}>
+              <summary
+                className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full cursor-pointer hover:bg-primary/20"
+                onClick={() => setIsMonadDropdownOpen(!isMonadDropdownOpen)}
+              >
+                <span className="text-sm font-medium text-primary">@{username}</span>
+                <span className="text-xs opacity-70">Monad Games ID</span>
+              </summary>
+              <div className="dropdown-content mt-2 p-4 bg-base-100 rounded-box shadow-lg min-w-80">
+                <div className="text-center mb-4">
+                  <h3 className="font-semibold text-lg">Game Wallet</h3>
+                  <p className="text-sm opacity-70">@{username}</p>
+                </div>
+                {gameWallet && <GameWalletFunding gameWallet={gameWallet} monadGamesIdWallet={null} />}
+              </div>
+            </details>
+          ) : hasUsername === false ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm opacity-70">No Monad ID</span>
+              <a
+                href={registerUsernameUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-xs btn-primary normal-case"
+              >
+                Register
+              </a>
+            </div>
+          ) : null}
+        </div>
         <RainbowKitCustomConnectButton />
         {isLocalNetwork && <FaucetButton />}
       </div>
