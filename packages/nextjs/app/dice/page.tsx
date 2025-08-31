@@ -5,7 +5,11 @@ import type { NextPage } from "next";
 import { Address as AddressType, formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
 import { Amount, Roll, RollEvents, Winner, WinnerEvents } from "~~/app/dice/_components";
+import { GameWalletFunding } from "~~/components/GameWalletFunding";
 import { useScaffoldReadContract, useScaffoldWriteContract, useWebSocketEvents } from "~~/hooks/scaffold-eth";
+import { useGameWallet } from "~~/hooks/useGameWallet";
+import { useGameWalletTransaction } from "~~/hooks/useGameWalletTransaction";
+import { useMonadGamesId } from "~~/hooks/useMonadGamesId";
 
 const ROLL_ETH_VALUE = "0.002";
 const MAX_TABLE_ROWS = 10;
@@ -19,6 +23,22 @@ const DiceGame: NextPage = () => {
   const [isRedeeming, setIsRedeeming] = useState(false);
 
   const { data: prize } = useScaffoldReadContract({ contractName: "DiceGame", functionName: "prize" });
+
+  // Monad Games ID integration
+  const {
+    username,
+    monadGamesIdWallet,
+    hasUsername,
+    isLoading: isLoadingUsername,
+    error: usernameError,
+    registerUsernameUrl,
+  } = useMonadGamesId();
+
+  // Game wallet management
+  const { gameWallet, isLoading: isLoadingGameWallet, error: gameWalletError } = useGameWallet();
+
+  // Game wallet transactions
+  const { rollDiceWithGameWallet, isTransactionPending, transactionError } = useGameWalletTransaction({ gameWallet });
 
   // Player stats
   const { data: playerStats } = useScaffoldReadContract({
@@ -75,6 +95,12 @@ const DiceGame: NextPage = () => {
   }, [redeemError]);
 
   useEffect(() => {
+    if (transactionError) {
+      immediateStopRolling();
+    }
+  }, [transactionError, immediateStopRolling]);
+
+  useEffect(() => {
     if (videoRef.current && !isRolling) {
       // show last frame
       videoRef.current.currentTime = 9999;
@@ -109,6 +135,50 @@ const DiceGame: NextPage = () => {
           {/* Player Stats Section */}
           {address && (
             <div className="w-full max-w-md mb-6 p-4 bg-base-200 rounded-lg">
+              {/* Monad Games ID Username */}
+              <div className="mb-4 text-center">
+                {isLoadingUsername ? (
+                  <div className="text-sm opacity-70">Loading username...</div>
+                ) : usernameError ? (
+                  <div className="text-sm text-error">Error loading username</div>
+                ) : hasUsername && username ? (
+                  <div>
+                    <div className="text-lg font-semibold text-primary">@{username}</div>
+                    <div className="text-xs opacity-70">Monad Games ID</div>
+                  </div>
+                ) : hasUsername === false ? (
+                  <div className="text-center">
+                    <div className="text-sm opacity-70 mb-2">No username found</div>
+                    <a
+                      href={registerUsernameUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-xs btn-primary normal-case"
+                    >
+                      Register Username
+                    </a>
+                  </div>
+                ) : null}
+              </div>
+
+              {/* Game Wallet Status */}
+              <div className="mb-4 text-center">
+                {isLoadingGameWallet ? (
+                  <div className="text-sm opacity-70">Initializing game wallet...</div>
+                ) : gameWalletError ? (
+                  <div className="text-sm text-error">Error: {gameWalletError}</div>
+                ) : gameWallet ? (
+                  <div>
+                    <div className="text-sm opacity-70">Game Wallet Ready</div>
+                    <div className="text-xs font-mono bg-base-300 p-1 rounded mt-1">
+                      {gameWallet.address.slice(0, 6)}...{gameWallet.address.slice(-4)}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm opacity-70">Setting up game wallet...</div>
+                )}
+              </div>
+
               <h3 className="text-lg font-semibold mb-3 text-center">Your Stats</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
@@ -141,9 +211,26 @@ const DiceGame: NextPage = () => {
             </div>
           )}
 
+          {/* Game Wallet Funding Section */}
+          {address && gameWallet && (
+            <GameWalletFunding gameWallet={gameWallet} monadGamesIdWallet={monadGamesIdWallet} />
+          )}
+
           <div className="flex w-full justify-center">
-            <span className="text-xl"> Roll a 0, 1, 2, 3, 4 or 5 to win the prize! </span>
+            <span className="text-xl"> Roll 7-15 to win the prize! </span>
           </div>
+
+          {gameWallet && (
+            <div className="flex w-full justify-center mt-2">
+              <span className="text-sm opacity-70">Using game wallet for transactions</span>
+            </div>
+          )}
+
+          {transactionError && (
+            <div className="flex w-full justify-center mt-2">
+              <span className="text-sm text-error">Transaction error: {transactionError}</span>
+            </div>
+          )}
 
           <div className="flex items-center mt-1">
             <span className="text-lg mr-2">Prize:</span>
@@ -157,16 +244,22 @@ const DiceGame: NextPage = () => {
               }
               setIsRolling(true);
               try {
-                await writeDiceGameAsync({ functionName: "rollTheDice", value: parseEther(ROLL_ETH_VALUE) });
+                if (gameWallet) {
+                  // Use game wallet for transaction
+                  await rollDiceWithGameWallet();
+                } else {
+                  // Fallback to connected wallet
+                  await writeDiceGameAsync({ functionName: "rollTheDice", value: parseEther(ROLL_ETH_VALUE) });
+                }
               } catch (err) {
                 console.error("Error calling rollTheDice function", err);
                 immediateStopRolling();
               }
             }}
-            disabled={isRolling}
+            disabled={isRolling || isTransactionPending || !gameWallet}
             className="mt-2 btn btn-secondary btn-xl normal-case font-xl text-lg"
           >
-            Roll the dice!
+            {isRolling || isTransactionPending ? "Rolling..." : "Roll the dice!"}
           </button>
 
           <div className="flex mt-8">

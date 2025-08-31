@@ -9,6 +9,7 @@ import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
 import { CubeIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
+import { useMonadGamesId } from "~~/hooks/useMonadGamesId";
 
 type HeaderMenuLink = {
   label: string;
@@ -65,6 +66,7 @@ export const HeaderMenuLinks = () => {
 export const Header = () => {
   const { targetNetwork } = useTargetNetwork();
   const isLocalNetwork = targetNetwork.id === hardhat.id;
+  const { username, hasUsername, isLoading: isLoadingUsername, registerUsernameUrl } = useMonadGamesId();
 
   const burgerMenuRef = useRef<HTMLDetailsElement>(null);
   useOutsideClick(burgerMenuRef, () => {
@@ -100,6 +102,31 @@ export const Header = () => {
           <HeaderMenuLinks />
         </ul>
       </div>
+
+      {/* Monad Games ID Display */}
+      <div className="navbar-center hidden lg:flex">
+        {isLoadingUsername ? (
+          <div className="text-sm opacity-70">Loading Monad ID...</div>
+        ) : hasUsername && username ? (
+          <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
+            <span className="text-sm font-medium text-primary">@{username}</span>
+            <span className="text-xs opacity-70">Monad Games ID</span>
+          </div>
+        ) : hasUsername === false ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm opacity-70">No Monad ID</span>
+            <a
+              href={registerUsernameUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-xs btn-primary normal-case"
+            >
+              Register
+            </a>
+          </div>
+        ) : null}
+      </div>
+
       <div className="navbar-end grow mr-4">
         <RainbowKitCustomConnectButton />
         {isLocalNetwork && <FaucetButton />}
