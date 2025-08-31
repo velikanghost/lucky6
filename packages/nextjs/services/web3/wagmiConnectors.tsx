@@ -1,13 +1,6 @@
 import { toPrivyWallet } from "@privy-io/cross-app-connect/rainbow-kit";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
-import {
-  coinbaseWallet,
-  ledgerWallet,
-  metaMaskWallet,
-  rainbowWallet,
-  safeWallet,
-  walletConnectWallet,
-} from "@rainbow-me/rainbowkit/wallets";
+import { metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { rainbowkitBurnerWallet } from "burner-connector";
 import * as chains from "viem/chains";
 import scaffoldConfig from "~~/scaffold.config";
@@ -22,11 +15,6 @@ const wallets = [
     iconUrl: "https://monad.xyz/favicon.ico", // Monad favicon
   }),
   metaMaskWallet,
-  walletConnectWallet,
-  ledgerWallet,
-  coinbaseWallet,
-  rainbowWallet,
-  safeWallet,
   ...(!targetNetworks.some(network => network.id !== (chains.hardhat as chains.Chain).id) || !onlyLocalBurnerWallet
     ? [rainbowkitBurnerWallet]
     : []),
@@ -38,7 +26,7 @@ const wallets = [
 export const wagmiConnectors = connectorsForWallets(
   [
     {
-      groupName: "Supported Wallets",
+      groupName: "Recommended",
       wallets,
     },
   ],

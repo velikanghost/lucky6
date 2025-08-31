@@ -5,7 +5,6 @@ import type { NextPage } from "next";
 import { Address as AddressType, formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
 import { Amount, Roll, RollEvents, Winner, WinnerEvents } from "~~/app/dice/_components";
-import { GameWalletFunding } from "~~/components/GameWalletFunding";
 import { useScaffoldReadContract, useScaffoldWriteContract, useWebSocketEvents } from "~~/hooks/scaffold-eth";
 import { useGameWallet } from "~~/hooks/useGameWallet";
 import { useGameWalletTransaction } from "~~/hooks/useGameWalletTransaction";
@@ -27,7 +26,6 @@ const DiceGame: NextPage = () => {
   // Monad Games ID integration
   const {
     username,
-    monadGamesIdWallet,
     hasUsername,
     isLoading: isLoadingUsername,
     error: usernameError,
@@ -35,7 +33,7 @@ const DiceGame: NextPage = () => {
   } = useMonadGamesId();
 
   // Game wallet management
-  const { gameWallet, isLoading: isLoadingGameWallet, error: gameWalletError } = useGameWallet();
+  const { gameWallet } = useGameWallet();
 
   // Game wallet transactions
   const { rollDiceWithGameWallet, redeemCardsWithGameWallet, isTransactionPending, transactionError } =
@@ -169,23 +167,7 @@ const DiceGame: NextPage = () => {
                 ) : null}
               </div>
 
-              {/* Game Wallet Status */}
-              <div className="mb-4 text-center">
-                {isLoadingGameWallet ? (
-                  <div className="text-sm opacity-70">Initializing game wallet...</div>
-                ) : gameWalletError ? (
-                  <div className="text-sm text-error">Error: {gameWalletError}</div>
-                ) : gameWallet ? (
-                  <div>
-                    <div className="text-sm opacity-70">Game Wallet Ready</div>
-                    <div className="text-xs font-mono bg-base-300 p-1 rounded mt-1">
-                      {gameWallet.address.slice(0, 6)}...{gameWallet.address.slice(-4)}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-sm opacity-70">Setting up game wallet...</div>
-                )}
-              </div>
+              {/* Game Wallet Status - Now available in header dropdown */}
 
               <h3 className="text-lg font-semibold mb-3 text-center">Your Stats</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
@@ -219,10 +201,7 @@ const DiceGame: NextPage = () => {
             </div>
           )}
 
-          {/* Game Wallet Funding Section */}
-          {address && gameWallet && (
-            <GameWalletFunding gameWallet={gameWallet} monadGamesIdWallet={monadGamesIdWallet} />
-          )}
+          {/* Game Wallet Funding Section - Now available in header dropdown */}
 
           <div className="flex w-full justify-center">
             <span className="text-xl"> Roll 7-15 to win the prize! </span>
