@@ -18,7 +18,7 @@ const DiceGame: NextPage = () => {
   const { data: prize } = useScaffoldReadContract({ contractName: "DiceGame", functionName: "prize" });
 
   // Use WebSocket for real-time events
-  const { rolls: wsRolls, winners: wsWinners, isConnected, error: wsError } = useWebSocketEvents();
+  const { rolls: wsRolls, winners: wsWinners } = useWebSocketEvents();
 
   // Convert WebSocket data to match existing component types
   const rolls: Roll[] = wsRolls.map(wsRoll => ({
@@ -75,15 +75,7 @@ const DiceGame: NextPage = () => {
 
           <div className="flex items-center mt-1">
             <span className="text-lg mr-2">Prize:</span>
-            <Amount amount={prize ? Number(formatEther(prize)) : 0} showUsdPrice className="text-lg" />
-          </div>
-
-          {/* WebSocket Connection Status */}
-          <div className="flex items-center mt-2">
-            <span className="text-sm mr-2">WebSocket:</span>
-            <div className={`w-3 h-3 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}></div>
-            <span className="text-sm ml-1">{isConnected ? "Connected" : "Disconnected"}</span>
-            {wsError && <span className="text-sm text-red-500 ml-2">Error: {wsError}</span>}
+            <Amount amount={prize ? Number(formatEther(prize)) : 0} className="text-lg" />
           </div>
 
           <button

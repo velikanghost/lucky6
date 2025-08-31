@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Amount } from "./Amount";
 import { Address as AddressType, formatEther } from "viem";
 import { Address } from "~~/components/scaffold-eth";
@@ -13,7 +12,6 @@ export type WinnerEventsProps = {
 };
 
 export const WinnerEvents = ({ winners }: WinnerEventsProps) => {
-  const [showUsdPrice, setShowUsdPrice] = useState(true);
   return (
     <div className="mx-10">
       <div className="flex w-auto justify-center h-10">
@@ -26,13 +24,7 @@ export const WinnerEvents = ({ winners }: WinnerEventsProps) => {
             <th className="bg-primary" colSpan={3}>
               Address
             </th>
-            <th
-              className="bg-primary"
-              colSpan={2}
-              onClick={() => {
-                setShowUsdPrice(!showUsdPrice);
-              }}
-            >
+            <th className="bg-primary" colSpan={2}>
               Won
             </th>
           </tr>
@@ -43,18 +35,8 @@ export const WinnerEvents = ({ winners }: WinnerEventsProps) => {
               <td colSpan={3}>
                 <Address address={address} size="lg" />
               </td>
-              <td
-                colSpan={2}
-                onClick={() => {
-                  setShowUsdPrice(!showUsdPrice);
-                }}
-              >
-                <Amount
-                  showUsdPrice={showUsdPrice}
-                  amount={Number(formatEther(amount))}
-                  disableToggle
-                  className="text-lg"
-                />
+              <td colSpan={2}>
+                <Amount amount={Number(formatEther(amount))} className="text-lg" />
               </td>
             </tr>
           ))}
