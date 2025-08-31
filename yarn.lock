@@ -2360,7 +2360,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:^1.6.0, @noble/curves@npm:^1.9.1, @noble/curves@npm:~1.9.0":
+"@noble/curves@npm:^1.5.0, @noble/curves@npm:^1.6.0, @noble/curves@npm:^1.9.1, @noble/curves@npm:~1.9.0":
   version: 1.9.7
   resolution: "@noble/curves@npm:1.9.7"
   dependencies:
@@ -3024,6 +3024,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@privy-io/cross-app-connect@npm:^0.2.3":
+  version: 0.2.3
+  resolution: "@privy-io/cross-app-connect@npm:0.2.3"
+  dependencies:
+    "@noble/curves": ^1.5.0
+    "@noble/hashes": 1.3.2
+    "@scure/base": ~1.1.2
+    fflate: 0.8.2
+  peerDependencies:
+    "@rainbow-me/rainbowkit": ^2.2.3
+    "@wagmi/core": ^2.16.4
+    viem: ^2.22.23
+  peerDependenciesMeta:
+    "@rainbow-me/rainbowkit":
+      optional: true
+    "@wagmi/core":
+      optional: true
+  checksum: f1c41a1d99616c715fc59533cead89ebd66137075c2908a7cffd7353245cccffd4a28e77ce33b1726114b9114c45b08521380c06951375cf8e32e32be7b4c27f
+  languageName: node
+  linkType: hard
+
 "@protobufjs/aspromise@npm:^1.1.1, @protobufjs/aspromise@npm:^1.1.2":
   version: 1.1.2
   resolution: "@protobufjs/aspromise@npm:1.1.2"
@@ -3301,7 +3322,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/base@npm:~1.1.0, @scure/base@npm:~1.1.6":
+"@scure/base@npm:~1.1.0, @scure/base@npm:~1.1.2, @scure/base@npm:~1.1.6":
   version: 1.1.9
   resolution: "@scure/base@npm:1.1.9"
   checksum: 120820a37dfe9dfe4cab2b7b7460552d08e67dee8057ed5354eb68d8e3440890ae983ce3bee957d2b45684950b454a2b6d71d5ee77c1fd3fddc022e2a510337f
@@ -3439,6 +3460,7 @@ __metadata:
   resolution: "@se-2/nextjs@workspace:packages/nextjs"
   dependencies:
     "@heroicons/react": ~2.1.5
+    "@privy-io/cross-app-connect": ^0.2.3
     "@rainbow-me/rainbowkit": 2.2.7
     "@tailwindcss/postcss": 4.0.15
     "@tanstack/react-query": ~5.59.15
@@ -9071,6 +9093,13 @@ __metadata:
     picomatch:
       optional: true
   checksum: bd537daa9d3cd53887eed35efa0eab2dbb1ca408790e10e024120e7a36c6e9ae2b33710cb8381e35def01bc9c1d7eaba746f886338413e68ff6ebaee07b9a6e8
+  languageName: node
+  linkType: hard
+
+"fflate@npm:0.8.2":
+  version: 0.8.2
+  resolution: "fflate@npm:0.8.2"
+  checksum: 29470337b85d3831826758e78f370e15cda3169c5cd4477c9b5eea2402261a74b2975bae816afabe1c15d21d98591e0d30a574f7103aa117bff60756fa3035d4
   languageName: node
   linkType: hard
 

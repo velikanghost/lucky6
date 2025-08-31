@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPublicClient, decodeEventLog, parseAbiItem, webSocket } from "viem";
 import { monadTestnet } from "viem/chains";
+import deployedContracts from "~~/contracts/deployedContracts";
 
 const wsUrl = "wss://testnet-rpc.monad.xyz";
 
@@ -37,7 +38,7 @@ export const useWebSocketEvents = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const contractAddress = "0xCA540215887072499ac788F4F72b3775F850c0ef";
+  const contractAddress = deployedContracts[10143].DiceGame.address;
 
   const addRoll = useCallback((roll: WebSocketRoll) => {
     setRolls(prev => [roll, ...prev.slice(0, 9)]); // Keep only last 10 rolls

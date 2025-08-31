@@ -1,3 +1,4 @@
+import { toPrivyWallet } from "@privy-io/cross-app-connect/rainbow-kit";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import {
   coinbaseWallet,
@@ -14,6 +15,12 @@ import scaffoldConfig from "~~/scaffold.config";
 const { onlyLocalBurnerWallet, targetNetworks } = scaffoldConfig;
 
 const wallets = [
+  // Privy Global Wallet (Monad Games ID)
+  toPrivyWallet({
+    id: "cmd8euall0037le0my79qpz42",
+    name: "Monad Games ID",
+    iconUrl: "https://monad.xyz/favicon.ico", // Monad favicon
+  }),
   metaMaskWallet,
   walletConnectWallet,
   ledgerWallet,
@@ -37,7 +44,7 @@ export const wagmiConnectors = connectorsForWallets(
   ],
 
   {
-    appName: "scaffold-eth-2",
+    appName: "Gatherers",
     projectId: scaffoldConfig.walletConnectProjectId,
   },
 );
