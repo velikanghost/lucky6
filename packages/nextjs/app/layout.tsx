@@ -11,8 +11,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = getMetadata({
-  title: "Dice Game | SpeedRunEthereum",
-  description: "Built with 🏗 Scaffold-ETH 2",
+  title: "Lucky6 | Monad",
+  description: "The Ultimate Dice Game on Monad",
 });
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
